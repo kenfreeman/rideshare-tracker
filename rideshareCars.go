@@ -1,4 +1,4 @@
-package guestbook
+package rideshare_tracker
 
 import (
 	"html/template"
@@ -21,6 +21,12 @@ type RideshareCarView struct {
 	whenSeen    time.Time
 	seenBy	string
 	location string
+}
+
+func init() {
+	http.HandleFunc("/", showRideShareCars)
+	http.HandleFunc("/showRideShareCars", showRideShareCars)
+	http.HandleFunc("/addCar", addCar)
 }
 
 func showRideShareCars(responseWriter http.ResponseWriter, request *http.Request) {
