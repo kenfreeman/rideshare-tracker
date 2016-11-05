@@ -4,6 +4,10 @@
     <meta charset="UTF-8">
     <link href='http://fonts.googleapis.com/css?family=Open+Sans:300,600,400' rel='stylesheet' type='text/css'>
     <link href="//maxcdn.bootstrapcdn.com/font-awesome/4.2.0/css/font-awesome.min.css" rel="stylesheet">
+
+    <link type="text/css" rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/jsgrid/1.5.2/jsgrid.min.css" />
+    <link type="text/css" rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/jsgrid/1.5.2/jsgrid-theme.min.css" />
+
     <link rel="stylesheet" href="//code.jquery.com/ui/1.11.2/themes/cupertino/jquery-ui.css">
     <script src="//code.jquery.com/jquery-1.10.2.js"></script>
     <script src="//code.jquery.com/ui/1.11.2/jquery-ui.js"></script>
@@ -11,27 +15,51 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jsgrid/1.5.2/jsgrid.js"></script>
 
     <title>Rideshare Cars</title>
-    
+
     <script src="https://cdnjs.cloudflare.com/ajax/libs/modernizr/2.8.3/modernizr.min.js"></script>
 </head>
 <body>
-<table style=""width="100%">
-    <tr>
-        <th>Make</th>
-        <th>Model</th>
-    </tr>
-    {{range .}}
-    <tr>
-        <td>{{.Make}}</td>
-        <td>{{.Model}}</td>
-    </tr>
-    {{end}}
 
-</table>
+<div id="carGrid"></div>
+
+<script language="JavaScript">
+    $("#carGrid").jsGrid({
+        width: "100%",
+        height: "auto",
+
+        inserting: true,
+        editing: true,
+        sorting: true,
+        paging: false,
+        autoload: true,
+
+        controller: {
+            loadData: function(filter) {
+                var d = $.Deferred();
+
+                $.ajax({
+                    url: "/cars",
+                    dataType: "json"
+                }).done(function(response) {
+                    d.resolve(response);
+                });
+
+                return d.promise();
+            }
+        },
+
+        fields: [
+            { name: "Make", type: "text", width: 150 },
+            { name: "Model", type: "text", width: 150 },
+            { type: "control" }
+        ]
+    });
+</script>
+
 <p>Add New Car</p>
 <form action="/addCar" method="post">
-    <label for="make" >Make:</label><input type="text" name="make" id="make">
-    <label for="model" >Model:</label><input type="text" name="model" id="model">
+    <label for="make">Make:</label><input type="text" name="make" id="make">
+    <label for="model">Model:</label><input type="text" name="model" id="model">
     <div><input type="submit" value="Sighted New Car"></div>
 </form>
 

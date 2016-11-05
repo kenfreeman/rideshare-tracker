@@ -7,7 +7,6 @@ import (
 	"appengine"
 	"appengine/datastore"
 	"time"
-	"strconv"
 	"encoding/json"
 )
 
@@ -26,7 +25,7 @@ type RideshareCarView struct {
 
 func init() {
 	http.HandleFunc("/", showRideShareCars)
-	http.HandleFunc("/getCarsJson", getRideShareCars)
+	http.HandleFunc("/cars", getRideShareCars)
 	http.HandleFunc("/showRideShareCars", showRideShareCars)
 	http.HandleFunc("/addCar", addCar)
 }
@@ -53,30 +52,9 @@ func getRideShareCars(responseWriter http.ResponseWriter, request *http.Request)
 	responseWriter.Write(carsJson)
 }
 
-func showRideShareCars(responseWriter http.ResponseWriter, request *http.Request) {
-	context := appengine.NewContext(request)
-	// Ancestor queries, as shown here, are strongly consistent with the High
-	// Replication Datastore. Queries that span entity groups are eventually
-	// consistent. If we omitted the .Ancestor from this query there would be
-	// a slight chance that Greeting that had just been written would not
-	// show up in a query.
-	query := datastore.NewQuery("RideshareCar")
-	//	q := datastore.NewQuery("Greeting").Order("-Date").Limit(10)
-
-	cars := make([]RideshareCar, 0, 50)
-
-	if _, err := query.GetAll(context, &cars); err != nil {
-		http.Error(responseWriter, err.Error(), http.StatusInternalServerError)
-		return
-	}
-
-	context.Infof("car list read. Len = " + strconv.Itoa(len(cars)))
-	for i := 0; i < len(cars); i++ {
-		context.Infof("Car was read")
-	}
-
+func showRideShareCars(responseWriter http.ResponseWriter, _ *http.Request) {
 	var rideShareCarTemplate, _ = template.ParseFiles("listCars.html");
-	if err := rideShareCarTemplate.Execute(responseWriter, cars); err != nil {
+	if err := rideShareCarTemplate.Execute(responseWriter, nil); err != nil {
 		http.Error(responseWriter, err.Error(), http.StatusInternalServerError)
 	}
 }
