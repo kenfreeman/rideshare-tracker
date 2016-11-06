@@ -8,9 +8,11 @@ import (
 	"appengine/datastore"
 	"time"
 	"encoding/json"
+	"reflect"
 )
 
 type RideshareCar struct {
+	Key string
 	state string
 	plateNumber	string
 	Make	string
@@ -25,26 +27,33 @@ type RideshareCarView struct {
 
 func init() {
 	http.HandleFunc("/", showRideShareCars)
-	http.HandleFunc("/cars", getRideShareCars)
+	http.HandleFunc("/cars", carsWebService)
 	http.HandleFunc("/showRideShareCars", showRideShareCars)
 	http.HandleFunc("/addCar", addCar)
 }
 
-func getRideShareCars(responseWriter http.ResponseWriter, request *http.Request) {
+func carsWebService(responseWriter http.ResponseWriter, request *http.Request) {
 	context := appengine.NewContext(request)
-	// Ancestor queries, as shown here, are strongly consistent with the High
-	// Replication Datastore. Queries that span entity groups are eventually
-	// consistent. If we omitted the .Ancestor from this query there would be
-	// a slight chance that Greeting that had just been written would not
-	// show up in a query.
+
 	query := datastore.NewQuery("RideshareCar")
-	//	q := datastore.NewQuery("Greeting").Order("-Date").Limit(10)
 
 	cars := make([]RideshareCar, 0, 50)
 
-	if _, err := query.GetAll(context, &cars); err != nil {
-		http.Error(responseWriter, err.Error(), http.StatusInternalServerError)
-		return
+	t := query.Run(context)
+	for {
+		var car RideshareCar
+		key, err := t.Next(&car)
+		context.Infof("key is a " + reflect.TypeOf(key).String())
+		if err == datastore.Done {
+			break // No further entities match the query.
+		}
+		if err != nil {
+			context.Errorf("fetching next car: %v", err)
+			break
+		}
+		// Do something with Person p and Key k
+		car.Key = key.String()
+		cars = append(cars, car)
 	}
 
 	carsJson, _ := json.Marshal(cars)

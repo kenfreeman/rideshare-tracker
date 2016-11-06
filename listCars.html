@@ -13,6 +13,11 @@
     <script src="//code.jquery.com/ui/1.11.2/jquery-ui.js"></script>
     <script src="http://ajax.aspnetcdn.com/ajax/jquery.validate/1.9/jquery.validate.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jsgrid/1.5.2/jsgrid.js"></script>
+    <style>
+        .hidden {
+        display: none;
+        }
+    </style>
 
     <title>Rideshare Cars</title>
 
@@ -35,23 +40,43 @@
 
         controller: {
             loadData: function(filter) {
-                var d = $.Deferred();
-
-                $.ajax({
+                return $.ajax({
+                    type: "GET",
                     url: "/cars",
+                    data: filter,
                     dataType: "json"
-                }).done(function(response) {
-                    d.resolve(response);
                 });
+            },
+            insertItem: function(item) {
+                return $.ajax({
+                    type: "POST",
+                    url: "/cars",
+                    data: item
+                });
+            },
 
-                return d.promise();
-            }
+            updateItem: function(item) {
+                return $.ajax({
+                    type: "PUT",
+                    url: "/cars",
+                    data: item
+                });
+            },
+
+            deleteItem: function(item) {
+                return $.ajax({
+                    type: "DELETE",
+                    url: "/cars",
+                    data: item
+                });
+            },
         },
 
         fields: [
+            { name: "Key", type: "text", css: "hidden", width: 20},
             { name: "Make", type: "text", width: 150 },
             { name: "Model", type: "text", width: 150 },
-            { type: "control" }
+            { type: "control" },
         ]
     });
 </script>
