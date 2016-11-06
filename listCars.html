@@ -66,8 +66,7 @@
             deleteItem: function(item) {
                 return $.ajax({
                     type: "DELETE",
-                    url: "/cars",
-                    data: item
+                    url: "/cars?key=" + item.Key
                 });
             },
         },
