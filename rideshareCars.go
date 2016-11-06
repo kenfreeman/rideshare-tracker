@@ -76,11 +76,13 @@ func carsWebService(responseWriter http.ResponseWriter, request *http.Request) {
 		key := datastore.NewKey(context, kind, "", intId, nil)
 		context.Infof("kind = %s, stringId = %s, intId = %d, key = %s", kind, stringId, intId, key.String())
 		var car RideshareCar
-		err := datastore.Get(context, key, &car)
-		if err != nil {
-			context.Errorf("Error in get : %v", err)
+
+		car.Make = request.Form.Get("Make")
+		car.Model = request.Form.Get("Model")
+		if _, err  := datastore.Put(context, key, &car); err != nil {
+			context.Errorf("Error in put : %v", err)
+			return
 		}
-			context.Infof("car model = %s", car.Model)
 	}
 }
 
