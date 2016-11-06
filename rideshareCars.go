@@ -8,7 +8,8 @@ import (
 	"appengine/datastore"
 	"time"
 	"encoding/json"
-	"reflect"
+	"strings"
+	"strconv"
 )
 
 type RideshareCar struct {
@@ -35,30 +36,52 @@ func init() {
 func carsWebService(responseWriter http.ResponseWriter, request *http.Request) {
 	context := appengine.NewContext(request)
 
-	query := datastore.NewQuery("RideshareCar")
+	context.Infof("HTTP method is " + request.Method)
+	if (request.Method == http.MethodGet) {
+		query := datastore.NewQuery("RideshareCar")
 
-	cars := make([]RideshareCar, 0, 50)
+		cars := make([]RideshareCar, 0, 50)
 
-	t := query.Run(context)
-	for {
-		var car RideshareCar
-		key, err := t.Next(&car)
-		context.Infof("key is a " + reflect.TypeOf(key).String())
-		if err == datastore.Done {
-			break // No further entities match the query.
+		t := query.Run(context)
+		for {
+			var car RideshareCar
+			key, err := t.Next(&car)
+			if err == datastore.Done {
+				break // No further entities match the query.
+			}
+			if err != nil {
+				context.Errorf("fetching next car: %v", err)
+				break
+			}
+			// Do something with Person p and Key k
+			car.Key = key.String()
+			cars = append(cars, car)
 		}
-		if err != nil {
-			context.Errorf("fetching next car: %v", err)
-			break
-		}
-		// Do something with Person p and Key k
-		car.Key = key.String()
-		cars = append(cars, car)
+
+		carsJson, _ := json.Marshal(cars)
+		responseWriter.Header().Set("Content-Type", "application/json")
+		responseWriter.Write(carsJson)
+		return
 	}
-
-	carsJson, _ := json.Marshal(cars)
-	responseWriter.Header().Set("Content-Type", "application/json")
-	responseWriter.Write(carsJson)
+	if (request.Method == http.MethodPut) {
+		request.ParseForm()
+		for k, v := range request.Form {
+			context.Infof("key[%s] value[%s]\n", k, v)
+		}
+		keyString := request.Form.Get("Key")
+		keyStrings := strings.Split(keyString, ",")
+		kind := strings.Trim(keyStrings[0], "/ ")
+		stringId := strings.TrimSpace(keyStrings[1])
+		intId, _ := strconv.ParseInt(stringId, 10, 64)
+		key := datastore.NewKey(context, kind, "", intId, nil)
+		context.Infof("kind = %s, stringId = %s, intId = %d, key = %s", kind, stringId, intId, key.String())
+		var car RideshareCar
+		err := datastore.Get(context, key, &car)
+		if err != nil {
+			context.Errorf("Error in get : %v", err)
+		}
+			context.Infof("car model = %s", car.Model)
+	}
 }
 
 func showRideShareCars(responseWriter http.ResponseWriter, _ *http.Request) {
