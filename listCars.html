@@ -22,6 +22,66 @@
     <title>Rideshare Cars</title>
 
     <script src="https://cdnjs.cloudflare.com/ajax/libs/modernizr/2.8.3/modernizr.min.js"></script>
+
+    <script language="JavaScript">
+        var db = {};
+        window.db = db;
+        db.states = [
+            { Name: "Massachusetts", Id: "MA"},
+            { Name: "New Hampshire", Id: "NH"},
+            { Name: "Rhode Island", Id: "RI"},
+            { Name: "Connecticut", Id: "CT"},
+            { Name: "New York", Id: "NY"},
+            { Name: "Maine", Id: "ME"},
+            { Name: "Vermont", Id: "VT"},
+            { Name: "New Jersey", Id: "NJ"},
+            { Name: "Pennsylvania", Id: "PA"},
+            { Name: "Maryland", Id: "MD"},
+            { Name: "District of Columbia", Id: "DC"},
+            { Name: "Delaware", Id: "DE"},
+            { Name: "Virginia", Id: "VA"},
+            { Name: "West Virginia", Id: "WV"},
+            { Name: "North Carolina", Id: "NC"},
+            { Name: "South Carolina", Id: "SC"},
+            { Name: "Georgia", Id: "GA"},
+            { Name: "Florida", Id: "FL"},
+            { Name: "Ohio", Id: "OH"},
+            { Name: "Kentucky", Id: "KY"},
+            { Name: "Tennessee", Id: "TN"},
+            { Name: "Alabama", Id: "AL"},
+            { Name: "Mississippi", Id: "MI"},
+            { Name: "Lousiana", Id: "LA"},
+            { Name: "Arkansas", Id: "AR"},
+            { Name: "Missouri", Id: "MO"},
+            { Name: "Kansas", Id: "KS"},
+            { Name: "Indiana", Id: "IN"},
+            { Name: "Illinois", Id: "IL"},
+            { Name: "Michigan", Id: "MI"},
+            { Name: "Wisconsin", Id: "WI"},
+            { Name: "Minnesota", Id: "MN"},
+            { Name: "North Dakota", Id: "ND"},
+            { Name: "South Dakota", Id: "SD"},
+            { Name: "Iowa", Id: "IA"},
+            { Name: "Texas", Id: "TX"},
+            { Name: "Oklahoma", Id: "OK"},
+            { Name: "Nebraska", Id: "NE"},
+            { Name: "Montana", Id: "MT"},
+            { Name: "Idaho", Id: "ID"},
+            { Name: "Washington", Id: "WA"},
+            { Name: "Oregon", Id: "OR"},
+            { Name: "California", Id: "CA"},
+            { Name: "Arizona", Id: "AZ"},
+            { Name: "New Mexico", Id: "NM"},
+            { Name: "Colorado", Id: "CO"},
+            { Name: "Wyoming", Id: "WY"},
+            { Name: "Utah", Id: "UT"},
+            { Name: "Nevada", Id: "NV"},
+            { Name: "Alaska", Id: "AK"},
+            { Name: "Hawaii", Id: "HI"},
+    ].sort(function(a, b) {
+                  return a.Name > b.Name ? 1 : -1;
+                });
+    </script>
 </head>
 <body>
 
@@ -73,19 +133,17 @@
 
         fields: [
             { name: "Key", type: "text", css: "hidden", width: 20},
-            { name: "Make", type: "text", width: 150 },
-            { name: "Model", type: "text", width: 150 },
-            { type: "control" },
+            { name: "Make", type: "text", width: 150, validate: "required"},
+            { name: "Model", type: "text", width: 150, validate: "required"},
+            { name: "Color", type: "text", width: 150, validate: "required"},
+            { name: "State", type: "select",
+                items: db.states,
+                valueField: "Id", textField: "Name", validate: "required", align: "left",   },
+            { name: "PlateNumber", type: "text", label: "Plate", width: 150, validate: "required"},
+            { type: "control"},
         ]
     });
 </script>
-
-<p>Add New Car</p>
-<form action="/addCar" method="post">
-    <label for="make">Make:</label><input type="text" name="make" id="make">
-    <label for="model">Model:</label><input type="text" name="model" id="model">
-    <div><input type="submit" value="Sighted New Car"></div>
-</form>
 
 </body>
 </html>
