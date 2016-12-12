@@ -9,10 +9,14 @@
     <link type="text/css" rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/jsgrid/1.5.2/jsgrid-theme.min.css" />
 
     <link rel="stylesheet" href="//code.jquery.com/ui/1.11.2/themes/cupertino/jquery-ui.css">
-    <script src="//code.jquery.com/jquery-1.10.2.js"></script>
-    <script src="//code.jquery.com/ui/1.11.2/jquery-ui.js"></script>
+    <script src="//code.jquery.com/jquery-1.10.2.min.js"></script>
+    <script src="//code.jquery.com/ui/1.11.2/jquery-ui.min.js"></script>
     <script src="http://ajax.aspnetcdn.com/ajax/jquery.validate/1.9/jquery.validate.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jsgrid/1.5.2/jsgrid.js"></script>
+
+    <link href="http://hayageek.github.io/jQuery-Upload-File/4.0.10/uploadfile.css" rel="stylesheet">
+    <script src="http://hayageek.github.io/jQuery-Upload-File/4.0.10/jquery.uploadfile.min.js"></script>
+
     <style>
         .hidden {
         display: none;
@@ -88,6 +92,46 @@
 <div id="carGrid"></div>
 
 <script language="JavaScript">
+$(function() {
+    var PhotoField = function(config) {
+        jsGrid.Field.call(this, config);
+    };
+
+    PhotoField.prototype = new jsGrid.Field({
+        itemTemplate: function(value) {
+            photoUrl = "https://randomuser.me/api/portraits/women/67.jpg";
+            return $("<div>").addClass("client-photo").append($("<img>").attr("src", photoUrl));
+        },
+
+        insertTemplate: function(value) {
+            return this._insertPicker = $("<input>").datepicker({ defaultDate: new Date() });
+        },
+
+        editTemplate: function(value) {
+            var picker =  $("<div>");
+            picker.text("Upload");
+            picker.attr("id", "Upload" + value.Key);
+            picker.uploadFile({
+                url: "uploadPhoto",
+                fileName: "photo" + value.Key,
+                maxFileCount: 1,
+                multiple: false,
+                acceptFiles: "image/*"
+                });
+            return this._editPicker = picker;
+        },
+
+        insertValue: function() {
+            return this._insertPicker.datepicker("getDate").toISOString();
+        },
+
+        editValue: function() {
+            return this._editPicker.datepicker("getDate").toISOString();
+        }
+    });
+
+    jsGrid.fields.photoField = PhotoField;
+
     $("#carGrid").jsGrid({
         width: "100%",
         height: "auto",
@@ -139,10 +183,12 @@
             { name: "State", type: "select",
                 items: db.states,
                 valueField: "Id", textField: "Name", validate: "required", align: "left",   },
-            { name: "PlateNumber", type: "text", label: "Plate", width: 150, validate: "required"},
+            { name: "PlateNumber", type: "text", title: "Plate", width: 150, validate: "required"},
+            { name: "Photo", title: "Photo", type: "photoField", sorting: false, width: 150},
             { type: "control"},
         ]
     });
+});
 </script>
 
 </body>

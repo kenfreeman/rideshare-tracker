@@ -20,6 +20,10 @@ type RideshareCar struct {
 	Make	string
 	Model string
 	Color string
+	Photo struct{
+		Key string
+		PhotoId string
+	      }
 }
 type RideshareCarView struct {
 	whenSeen    time.Time
@@ -50,6 +54,8 @@ func getCars(context appengine.Context) ([]RideshareCar){
 		}
 		// Do something with Person p and Key k
 		car.Key = key.String()
+		car.Photo.Key = car.Key
+		car.Photo.PhotoId = "asdfg"
 		cars = append(cars, car)
 	}
 	return cars
